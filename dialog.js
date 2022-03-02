@@ -1,3 +1,4 @@
+'use strict'
 export function dialog(x, y, defaults = {}) {
     return new Promise((resolve, reject) => {
         const div = document.createElement('div')
@@ -97,7 +98,7 @@ export function dialog(x, y, defaults = {}) {
 
         cancelButton.onclick = () => {
             div.remove()
-            reject()
+            resolve(null)
         }
 
         div.appendChild(form)

@@ -1,3 +1,4 @@
+'use strict'
 const G = 6.67 * Math.pow(10, -11)
 
 export default class Ball {
@@ -66,9 +67,20 @@ export default class Ball {
         ctx.stroke()
     }
 
-    update(ctx, balls) {
+    update(ctx, balls, delta) {
+        // const gap = 5
         for (const ball of balls)
-            if (this !== ball) ball.applyForce(this.calculateForce(ball), this)
+            if (this !== ball) {
+                /* if (
+                    this.pos.x + this.radius + gap >= ball.pos.x - ball.radius - gap &&
+                    this.pos.x - this.radius - gap <= ball.pos.x + ball.radius + gap &&
+                    this.pos.y + this.radius + gap >= ball.pos.y - ball.radius - gap &&
+                    this.pos.y - this.radius - gap <= ball.pos.y + ball.radius + gap
+                ) {
+                    continue
+                } */
+                ball.applyForce(this.calculateForce(ball), this, delta)
+            }
 
         this.draw(ctx)
     }
@@ -84,7 +96,7 @@ export default class Ball {
         return G * ((this.mass * ball.mass) / Math.pow(this.distance(ball), 2))
     }
 
-    applyForce(force, ball) {
+    applyForce(force, ball, delta) {
         if (this.isStatic) return
         // if (force === Infinity) return
         this.history.push({
@@ -98,8 +110,8 @@ export default class Ball {
         const normalized = normalize(direction)
         this.velocity.x += force * normalized.x
         this.velocity.y += force * normalized.y
-        this.pos.x += this.velocity.x
-        this.pos.y += this.velocity.y
+        this.pos.x += this.velocity.x * delta
+        this.pos.y += this.velocity.y * delta
     }
 }
 
