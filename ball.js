@@ -110,8 +110,8 @@ export default class Ball {
         const normalized = normalize(direction)
         this.velocity.x += force * normalized.x
         this.velocity.y += force * normalized.y
-        this.pos.x += this.velocity.x * delta
-        this.pos.y += this.velocity.y * delta
+        this.pos.x += this.velocity.x //* delta
+        this.pos.y += this.velocity.y //* delta
     }
 }
 
