@@ -36,7 +36,15 @@ export default class Ball {
         this.draw(ctx)
     }
 
-    constructor(x = 0, y = 0, vx = 0, vy = 0, mass = 5000000, radius = 15, isStatic = false) {
+    constructor(
+        x = 0,
+        y = 0,
+        vx = 0,
+        vy = 0,
+        mass = 5000000,
+        radius = 15,
+        isStatic = false
+    ) {
         this.initialPos.x = x
         this.initialPos.y = y
         this.pos.x = x
@@ -68,37 +76,29 @@ export default class Ball {
     }
 
     update(ctx, balls, delta) {
-        // const gap = 5
         for (const ball of balls)
-            if (this !== ball) {
-                /* if (
-                    this.pos.x + this.radius + gap >= ball.pos.x - ball.radius - gap &&
-                    this.pos.x - this.radius - gap <= ball.pos.x + ball.radius + gap &&
-                    this.pos.y + this.radius + gap >= ball.pos.y - ball.radius - gap &&
-                    this.pos.y - this.radius - gap <= ball.pos.y + ball.radius + gap
-                ) {
-                    continue
-                } */
+            if (this !== ball)
                 ball.applyForce(this.calculateForce(ball), this, delta)
-            }
 
         this.draw(ctx)
     }
 
     distance(ball) {
         const d = Math.sqrt(
-            Math.pow(this.pos.x - ball.pos.x, 2) + Math.pow(this.pos.y - ball.pos.y, 2)
+            Math.pow(this.pos.x - ball.pos.x, 2) +
+                Math.pow(this.pos.y - ball.pos.y, 2)
         )
-        return d
+        const min = 100
+        const max = 1000
+        return Math.min(Math.max(d, min), max)
     }
 
     calculateForce(ball) {
         return G * ((this.mass * ball.mass) / Math.pow(this.distance(ball), 2))
     }
 
-    applyForce(force, ball, delta) {
+    applyForce(force, ball) {
         if (this.isStatic) return
-        // if (force === Infinity) return
         this.history.push({
             x: this.pos.x,
             y: this.pos.y,
@@ -110,8 +110,8 @@ export default class Ball {
         const normalized = normalize(direction)
         this.velocity.x += force * normalized.x
         this.velocity.y += force * normalized.y
-        this.pos.x += this.velocity.x //* delta
-        this.pos.y += this.velocity.y //* delta
+        this.pos.x += this.velocity.x
+        this.pos.y += this.velocity.y
     }
 }
 

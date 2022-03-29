@@ -6,6 +6,8 @@ let running = false
 
 const h1 = document.querySelector('body > h1')
 
+const clearButton = document.querySelector('button.clear')
+
 const canvas = document.createElement('canvas')
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
@@ -13,10 +15,42 @@ const ctx = canvas.getContext('2d')
 document.body.appendChild(canvas)
 
 const balls = []
+load()
+
+function load() {
+    if (!localStorage.getItem('balls')) return
+    const ballsFromStorage = JSON.parse(localStorage.getItem('balls'))
+    for (const ball of ballsFromStorage) {
+        const newBall = new Ball(
+            ball.pos.x,
+            ball.pos.y,
+            ball.initialVelocity.x,
+            ball.initialVelocity.y,
+            ball.mass,
+            ball.radius,
+            ball.isStatic
+        )
+        balls.push(newBall)
+        newBall.draw(ctx)
+    }
+    if (balls.length > 0) h1.style.display = 'none'
+}
+
+clearButton.onclick = () => {
+    if (running) return
+    balls.length = 0
+    h1.style = ''
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    save()
+}
 
 let draggingBall
 
 let open = true
+
+function save() {
+    localStorage.setItem('balls', JSON.stringify(balls))
+}
 
 canvas.onmousemove = ({ clientX, clientY }) => {
     if (running || !draggingBall) return
@@ -27,12 +61,14 @@ canvas.onmousemove = ({ clientX, clientY }) => {
     draggingBall.initialPos.y = clientY
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     for (const ball of balls) ball.draw(ctx)
+    save()
 }
 
 canvas.onmousedown = ({ clientX, clientY }) => {
     if (running) return
     const ball = clickedOnABall(clientX, clientY)
     if (ball) draggingBall = ball
+    save()
 }
 canvas.onmouseup = () => (draggingBall = null)
 
@@ -87,6 +123,7 @@ canvas.onclick = async ({ clientX, clientY }) => {
     }
 
     if (balls.length === 0) h1.style = ''
+    save()
 }
 
 function clickedOnABall(x, y) {
@@ -116,7 +153,8 @@ requestAnimationFrame(loop)
 
 const runButton = document.querySelector('button.run')
 runButton.onclick = () => {
-    if (balls.length < 2) return alert('You need at least 2 balls to run the simulation')
+    if (balls.length < 2)
+        return alert('You need at least 2 balls to run the simulation')
     if (running) {
         running = false
         runButton.innerText = 'Run'
